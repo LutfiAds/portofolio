@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #0b0f19;
+  color: #e5efff;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.container-section {
+  @apply mx-auto w-full max-w-6xl px-6 py-24 md:px-10;
+}
+
+.section-title {
+  @apply mb-6 text-3xl font-semibold tracking-tight text-cyber-primary md:text-4xl;
+}
+
+.card {
+  @apply rounded-xl border border-white/10 bg-cyber-panel/60 p-6 shadow-card backdrop-blur-sm;
+}
+
+@keyframes terminal-cursor {
+  0%,
+  45% {
+    opacity: 1;
+    text-shadow: 0 0 3px rgba(34, 211, 238, 0.35), 0 0 9px rgba(34, 211, 238, 0.25);
+  }
+  46%,
+  100% {
+    opacity: 0;
+    text-shadow: 0 0 2px rgba(34, 211, 238, 0.12);
+  }
+}
+
+@keyframes scroll-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+}
+
+@keyframes scroll-arrow {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.85;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.45;
+  }
+}
+
+@keyframes scanlines {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(12px);
+  }
+}
+
+@keyframes telemetry-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(4px, -7px, 0);
+  }
+}
+
+.animate-terminal-cursor {
+  animation: terminal-cursor 1.2s ease-in-out infinite;
+}
+
+.animate-scroll-float {
+  animation: scroll-float 2.2s ease-in-out infinite;
+}
+
+.animate-scroll-arrow {
+  animation: scroll-arrow 1.2s ease-in-out infinite;
+}
+
+.animate-scanlines {
+  animation: scanlines 12s linear infinite;
+}
+
+.animate-telemetry-drift {
+  animation: telemetry-drift 18s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-terminal-cursor,
+  .animate-scroll-float,
+  .animate-scroll-arrow,
+  .animate-scanlines,
+  .animate-telemetry-drift {
+    animation: none;
+  }
+}
