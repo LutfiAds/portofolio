@@ -1,6 +1,6 @@
 const projects = [
   {
-    title: "AI-Based Authentication Log Anomaly Detection System",
+    title: "Authentication Log Anomaly Detection Pipeline (Isolation Forest)",
     description:
       "Developed an authentication log analysis pipeline combining rule-based detection with machine learning anomaly detection using Isolation Forest.",
     details: [
@@ -9,13 +9,13 @@ const projects = [
     ]
   },
   {
-    title: "SOC Monitoring Lab Environment (Wazuh + Grafana)",
+    title: "SOC Monitoring Lab Deployment (Wazuh + Grafana)",
     description:
       "Built a monitoring lab environment using Wazuh and Grafana to simulate SOC visibility workflows.",
     details: []
   },
   {
-    title: "AI SOC Log Analyzer",
+    title: "SOC Authentication Log Analyzer (Anomaly Detection Tool)",
     description:
       "Developed a log analysis tool designed to identify suspicious authentication activity using anomaly detection techniques.",
     details: []

@@ -7,7 +7,7 @@ import { ExperienceSection } from "@/components/sections/ExperienceSection";
 import { ExpertiseGrid } from "@/components/sections/ExpertiseGrid";
 import { Hero } from "@/components/sections/Hero";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
-import { ResearchSection } from "@/components/sections/ResearchSection";
+import { ResearchTrajectoryMap } from "@/components/sections/ResearchSection";
 import { TerminalWidget } from "@/components/sections/TerminalWidget";
 import { Navbar } from "@/components/ui/Navbar";
 import { useGsapReveal } from "@/hooks/useGsapReveal";
@@ -26,7 +26,7 @@ export function PortfolioPage() {
       <ExperienceSection />
       <ProjectsSection />
       <CertificationsSection />
-      <ResearchSection />
+      <ResearchTrajectoryMap />
       <TerminalWidget />
       <ContactSection />
     </main>

@@ -83,6 +83,15 @@ body {
   }
 }
 
+@keyframes floatImpact {
+  0% {
+    transform: translateY(-6px);
+  }
+  100% {
+    transform: translateY(6px);
+  }
+}
+
 .animate-terminal-cursor {
   animation: terminal-cursor 1.2s ease-in-out infinite;
 }
@@ -103,12 +112,31 @@ body {
   animation: telemetry-drift 18s ease-in-out infinite;
 }
 
+.animate-float-impact {
+  animation: floatImpact 4s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0px rgba(56, 189, 248, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(56, 189, 248, 0.35);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-terminal-cursor,
   .animate-scroll-float,
   .animate-scroll-arrow,
   .animate-scanlines,
-  .animate-telemetry-drift {
+  .animate-telemetry-drift,
+  .animate-float-impact,
+  .animate-pulse-glow {
     animation: none;
   }
 }
