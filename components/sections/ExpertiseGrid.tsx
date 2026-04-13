@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -83,6 +83,35 @@ export function ExpertiseGrid() {
   const cardRefs = useRef<Array<HTMLElement | null>>([]);
   const [activeTooltipId, setActiveTooltipId] = useState<string | null>(null);
   const [isFinePointer, setIsFinePointer] = useState(false);
+  const [tooltipPos, setTooltipPos] = useState<{ above: boolean; nudgeX: number }>(
+    { above: true, nudgeX: 0 }
+  );
+
+  /** Measure available viewport space around the card and compute tooltip placement. */
+  const measureTooltipPos = useCallback((cardEl: HTMLElement | null) => {
+    if (!cardEl) return;
+    const TOOLTIP_W = Math.min(288, window.innerWidth * 0.85); // matches w-[min(18rem,85vw)]
+    const TOOLTIP_H = 130; // conservative estimated height
+    const GAP = 12;        // spacing between card edge and tooltip
+    const MARGIN = 10;     // minimum distance from viewport edge
+
+    const rect = cardEl.getBoundingClientRect();
+
+    // Prefer above; fall back to below if not enough room
+    const above = rect.top >= TOOLTIP_H + GAP + MARGIN;
+
+    // Center tooltip on card, then clamp so it stays inside viewport
+    const centerX = rect.left + rect.width / 2;
+    const halfW = TOOLTIP_W / 2;
+    let nudgeX = 0;
+    if (centerX - halfW < MARGIN) {
+      nudgeX = MARGIN - (centerX - halfW);
+    } else if (centerX + halfW > window.innerWidth - MARGIN) {
+      nudgeX = window.innerWidth - MARGIN - (centerX + halfW);
+    }
+
+    setTooltipPos({ above, nudgeX });
+  }, []);
 
   useLayoutEffect(() => {
     if (!sectionRef.current) return;
@@ -165,56 +194,91 @@ export function ExpertiseGrid() {
                   cardIndex += 1;
 
                   return (
-                    <article
-                      key={tooltipId}
-                      ref={(el) => {
-                        cardRefs.current[currentCardIndex] = el;
-                      }}
-                      className="card relative overflow-visible transition-[transform,border-color,background-color,box-shadow] duration-[200ms] ease-out before:pointer-events-none before:absolute before:left-0 before:top-0 before:h-full before:w-[2px] before:bg-cyber-secondary before:opacity-0 before:transition-opacity before:duration-[200ms] before:ease-out hover:-translate-y-[2px] hover:border-cyan-400/40 hover:bg-white/[0.03] hover:shadow-[0_0_12px_rgba(34,211,238,0.15)] hover:before:opacity-70 motion-reduce:duration-0 motion-reduce:hover:translate-y-0 motion-reduce:before:duration-0"
-                      tabIndex={0}
-                      role="button"
-                      data-expertise-card="true"
-                      aria-expanded={isTooltipActive}
-                      aria-controls={tooltipId}
-                      onMouseEnter={() => {
-                        if (!isFinePointer) return;
-                        setActiveTooltipId(tooltipId);
-                      }}
-                      onMouseLeave={() => {
-                        if (!isFinePointer) return;
-                        setActiveTooltipId((prev) => (prev === tooltipId ? null : prev));
-                      }}
-                      onClick={() => {
-                        if (isFinePointer) return;
-                        setActiveTooltipId((prev) => (prev === tooltipId ? null : tooltipId));
-                      }}
-                      onFocus={() => {
-                        setActiveTooltipId(tooltipId);
-                      }}
-                      onBlur={(event) => {
-                        const nextFocused = event.relatedTarget;
-                        if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) return;
-                        setActiveTooltipId(null);
-                      }}
-                    >
-                      <div
-                        id={tooltipId}
-                        role="tooltip"
-                        className={`pointer-events-none absolute -top-3 left-1/2 z-20 w-[min(18rem,85vw)] -translate-x-1/2 -translate-y-full rounded-md border border-cyber-secondary/70 bg-cyber-bg/95 px-3 py-2 font-mono text-xs leading-relaxed text-cyan-100 shadow-[0_8px_28px_rgba(0,0,0,0.35)] transition-opacity duration-[120ms] ease-out motion-reduce:duration-0 ${
-                          isTooltipActive ? "opacity-100" : "opacity-0"
-                        }`}
+                    <div key={tooltipId} className="relative">
+                      <article
+                        ref={(el) => {
+                          cardRefs.current[currentCardIndex] = el;
+                        }}
+                        className="card relative transition-[transform,border-color,background-color,box-shadow] duration-[150ms] ease-out motion-reduce:duration-0"
+                        style={{
+                          zIndex: isTooltipActive ? 20 : 10,
+                          transform: isTooltipActive
+                            ? "translateY(-6px) scale(1.02)"
+                            : "translateY(0) scale(1)",
+                          borderColor: isTooltipActive
+                            ? "rgba(34,211,238,0.30)"
+                            : undefined,
+                          boxShadow: isTooltipActive
+                            ? "0 8px 28px rgba(34,211,238,0.09), 0 0 0 1px rgba(34,211,238,0.13)"
+                            : undefined,
+                          backgroundColor: isTooltipActive
+                            ? "rgba(255,255,255,0.025)"
+                            : undefined,
+                        }}
+                        tabIndex={0}
+                        role="button"
+                        data-expertise-card="true"
+                        aria-expanded={isTooltipActive}
+                        aria-controls={tooltipId}
+                        onMouseEnter={() => {
+                          if (!isFinePointer) return;
+                          measureTooltipPos(cardRefs.current[currentCardIndex]);
+                          setActiveTooltipId(tooltipId);
+                        }}
+                        onMouseLeave={() => {
+                          if (!isFinePointer) return;
+                          setActiveTooltipId((prev) => (prev === tooltipId ? null : prev));
+                        }}
+                        onClick={() => {
+                          if (isFinePointer) return;
+                          const nextId = activeTooltipId === tooltipId ? null : tooltipId;
+                          if (nextId) measureTooltipPos(cardRefs.current[currentCardIndex]);
+                          setActiveTooltipId(nextId);
+                        }}
+                        onFocus={() => {
+                          measureTooltipPos(cardRefs.current[currentCardIndex]);
+                          setActiveTooltipId(tooltipId);
+                        }}
+                        onBlur={(event) => {
+                          const nextFocused = event.relatedTarget;
+                          if (nextFocused instanceof Node && event.currentTarget.contains(nextFocused)) return;
+                          setActiveTooltipId(null);
+                        }}
                       >
-                        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.12em] text-cyber-secondary/90">
-                          {item.title}
-                        </p>
-                        <ul className="space-y-1 font-mono text-xs text-slate-400">
-                          {item.tooltipDescriptors.map((descriptor) => (
-                            <li key={descriptor}>{descriptor}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <p className="text-base font-medium text-slate-100">{item.title}</p>
-                    </article>
+                        {/* Tooltip — adaptive positioning, highest z-index */}
+                        <div
+                          id={tooltipId}
+                          role="tooltip"
+                          className="pointer-events-none absolute w-[min(18rem,85vw)] rounded-md border border-cyber-secondary/60 bg-cyber-bg/95 px-3 py-2 font-mono text-xs leading-relaxed text-cyan-100 shadow-[0_8px_28px_rgba(0,0,0,0.4)]"
+                          style={{
+                            zIndex: 30,
+                            left: "50%",
+                            // Place above or below the card
+                            ...(tooltipPos.above
+                              ? { bottom: "calc(100% + 8px)", top: "auto" }
+                              : { top: "calc(100% + 8px)", bottom: "auto" }),
+                            // Slide 6px toward the card edge when hidden, settle at rest when shown
+                            transform: `translateX(calc(-50% + ${tooltipPos.nudgeX}px)) translateY(${
+                              isTooltipActive ? "0px" : tooltipPos.above ? "6px" : "-6px"
+                            })`,
+                            opacity: isTooltipActive ? 1 : 0,
+                            transition:
+                              "opacity 150ms ease-out, transform 150ms ease-out",
+                          }}
+                        >
+                          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.12em] text-cyber-secondary/90">
+                            {item.title}
+                          </p>
+                          <ul className="space-y-1 font-mono text-xs text-slate-400">
+                            {item.tooltipDescriptors.map((descriptor) => (
+                              <li key={descriptor}>{descriptor}</li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <p className="relative z-10 text-base font-medium text-slate-100">{item.title}</p>
+                      </article>
+                    </div>
                   );
                 })}
               </div>

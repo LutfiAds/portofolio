@@ -140,3 +140,82 @@ body {
     animation: none;
   }
 }
+
+/* ── Identity-badge contact cards ─────────────────────────────────── */
+.contact-badge {
+  @apply card flex flex-col items-start gap-0;
+  padding: 1.5rem 1.5rem 1.4rem;
+  transition:
+    border-color 200ms ease,
+    box-shadow   200ms ease;
+  text-decoration: none;
+  cursor: pointer;
+  outline-offset: 3px;
+}
+
+/* Whole-card cyan glow on hover / focus-visible */
+.contact-badge:hover,
+.contact-badge:focus-visible {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(56, 189, 248, 0.18),
+    inset 0 0 0 1px rgba(56, 189, 248, 0.12);
+}
+
+/* Icon wrapper */
+.contact-badge__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.5rem;
+  background: rgba(56, 189, 248, 0.08);
+  margin-bottom: 1rem;
+  transition: background 200ms ease, filter 200ms ease;
+}
+
+.contact-badge:hover .contact-badge__icon,
+.contact-badge:focus-visible .contact-badge__icon {
+  background: rgba(56, 189, 248, 0.14);
+  filter: brightness(1.2) drop-shadow(0 0 6px rgba(56, 189, 248, 0.35));
+}
+
+/* Lucide icon sizes */
+.contact-badge__svg {
+  width: 22px;
+  height: 22px;
+  color: #3ff8ff;
+  stroke-width: 1.6;
+}
+
+@media (max-width: 767px) {
+  .contact-badge__svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* UPPERCASE platform label */
+.contact-badge__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #3ff8ff;
+  margin-bottom: 0.3rem;
+}
+
+/* Readable link below label */
+.contact-badge__link {
+  font-size: 0.87rem;
+  color: #8a93a7;
+  word-break: break-all;
+  transition: color 200ms ease;
+}
+
+.contact-badge:hover .contact-badge__link,
+.contact-badge:focus-visible .contact-badge__link {
+  color: #c8d8ef;
+}
